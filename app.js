@@ -80,7 +80,22 @@ class Field {
     }
 }
 
-new Field().draw();
-new Mino(5,5,0,0).draw();
-new Mino(20,5,-4,0).draw();
+class Game {
+    constructor() {
+        this.mino = new Mino(5, 10, 0, 0);
+        this.field = new Field();
+        this.frames = 0;
+        this.fc++;
+    }
+    proc(){
+        this.mino.draw();
+        this.field.draw();
+        this.fc++;
+    }
+}
+
+let game = new Game();
+game.mino.y++;
+game.mino.rot+=6;
+game.proc();
 

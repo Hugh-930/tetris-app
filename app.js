@@ -18,7 +18,7 @@ class Block {
     //     });
     // }
     draw() {
-        fillRect(this.x, this.y, 50, 50);
+        ctx.fillRect(this.x, this.y, 50, 50);
     }
 }
 
@@ -62,5 +62,4 @@ class Field {
     }
 }
 
-new Block(0,0).draw();
-ctx.fillRect(50,50,50,50);
+new Block(50,0).draw();

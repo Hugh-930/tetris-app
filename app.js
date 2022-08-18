@@ -18,7 +18,7 @@ class Mino {
     constructor(x, y, rot, shape){
         this.x = x;
         this.y = y;
-        this.rot = (40+rot)%4;
+        this.rot = rot;
         this.shape = shape;
     }
     calcBlocks() {
@@ -28,9 +28,9 @@ class Mino {
             new Block(0,-1),
             new Block(1,0),
         ];
+        this.rot = (4+this.rot)%4;
         for(let r=0; r<this.rot; r++){
             blocks = blocks.map(b => new Block(-b.y, b.x));
-            console.log(this.rot)
         }
         return blocks;
     }
@@ -86,13 +86,17 @@ class Game {
         this.mino = new Mino(5, 10, 0, 0);
         this.field = new Field();
         this.minoVx = 0;
+        this.minoVy = 0;
         this.minoVr = 0;
-        this.fc++;
     }
     proc(){
         if(this.minoVx != 0){
             this.mino.x += this.minoVx;
             this.minoVx = 0;
+        }
+        if(this.minoVy != 0){
+            this.mino.y += this.minoVy;
+            this.minoVy = 0;
         }
         if(this.minoVr != 0){
             this.mino.rot += this.minoVr;
@@ -100,14 +104,13 @@ class Game {
         }
         this.mino.draw();
         this.field.draw();
-        this.fc++;
     }
 }
 
 let game = new Game();
-
+let keyName;
 document.addEventListener("keypress", event => {
-    let keyName = event.key;
+    keyName = event.key;
     console.log(keyName);
     if(keyName == "a") {
         ctx.clearRect(size, size, canvas.width-2*size, canvas.height-2*size);
@@ -115,22 +118,34 @@ document.addEventListener("keypress", event => {
         game.proc();
     }
     if (keyName == "d") {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.clearRect(size, size, canvas.width-2*size, canvas.height-2*size);
         game.minoVx = +1;
         game.proc();
     }
     if (keyName == "q") {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.clearRect(size, size, canvas.width-2*size, canvas.height-2*size);
         game.minoVr = -1;
         game.proc();
     }
     if (keyName == "e") {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.clearRect(size, size, canvas.width-2*size, canvas.height-2*size);
         game.minoVr = +1;
         game.proc();
     } 
 })
 
-game.proc();
+let counter = 0;
+const timerId = setInterval(function(){
+    if(++counter == 50){
+        ctx.clearRect(size, size, canvas.width-2*size, canvas.height-2*size);
+        game.minoVy = +1;
+        counter = 0;
+    }
+    game.proc();
+    if(keyName == "s"){ 
+        clearInterval(timerId)
+    }
+}, 20)
+
 
 

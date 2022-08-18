@@ -30,6 +30,7 @@ class Mino {
         ];
         for(let r=0; r<this.rot; r++){
             blocks = blocks.map(b => new Block(-b.y, b.x));
+            console.log(this.rot)
         }
         return blocks;
     }
@@ -84,10 +85,19 @@ class Game {
     constructor() {
         this.mino = new Mino(5, 10, 0, 0);
         this.field = new Field();
-        this.frames = 0;
+        this.minoVx = 0;
+        this.minoVr = 0;
         this.fc++;
     }
     proc(){
+        if(this.minoVx != 0){
+            this.mino.x += this.minoVx;
+            this.minoVx = 0;
+        }
+        if(this.minoVr != 0){
+            this.mino.rot += this.minoVr;
+            this.minoVr = 0;
+        }
         this.mino.draw();
         this.field.draw();
         this.fc++;
@@ -95,7 +105,32 @@ class Game {
 }
 
 let game = new Game();
-game.mino.y++;
-game.mino.rot+=6;
+
+document.addEventListener("keypress", event => {
+    let keyName = event.key;
+    console.log(keyName);
+    if(keyName == "a") {
+        ctx.clearRect(size, size, canvas.width-2*size, canvas.height-2*size);
+        game.minoVx = -1;
+        game.proc();
+    }
+    if (keyName == "d") {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        game.minoVx = +1;
+        game.proc();
+    }
+    if (keyName == "q") {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        game.minoVr = -1;
+        game.proc();
+    }
+    if (keyName == "e") {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        game.minoVr = +1;
+        game.proc();
+    } 
+})
+
 game.proc();
+
 

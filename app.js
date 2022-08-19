@@ -70,12 +70,12 @@ class Field {
         ];
     }
     tileAt(x, y){
-        return this.tiles[x][y];
+        return this.tiles[y][x];
     }
     draw() {
         for(let row=0; row<field_height; row++){
             for(let col=0; col<field_width; col++){
-                if(this.tileAt(row,col) == 1) ctx.fillRect(col*size, row*size, size, size);
+                if(this.tileAt(col, row) == 1) ctx.fillRect(col*size, row*size, size, size);
             }
         }
     }
@@ -89,17 +89,36 @@ class Game {
         this.minoVy = 0;
         this.minoVr = 0;
     }
+    isMinoMovable(mino, field) {
+        console.log(mino)
+        let blocks = mino.calcBlocks();
+        // blocks.dforEach(b => console.log(b.x+mino.x,b.y+mino.y));
+        blocks.forEach(b => console.log(field.tileAt(b.x+mino.x,b.y+mino.y)));
+        return blocks.every(b => field.tileAt(b.x+mino.x,b.y+mino.y) == 0);
+    }
     proc(){
         if(this.minoVx != 0){
-            this.mino.x += this.minoVx;
+            let futureMino = new Mino(this.mino.x, this.mino.y, this.mino.rot, this.mino.shape);
+            futureMino.x += this.minoVx;
+            if (this.isMinoMovable(futureMino, this.field)){
+                this.mino.x += this.minoVx;
+            }
             this.minoVx = 0;
         }
         if(this.minoVy != 0){
-            this.mino.y += this.minoVy;
+            let futureMino = new Mino(this.mino.x, this.mino.y, this.mino.rot, this.mino.shape);
+            futureMino.y += this.minoVy;
+            if (this.isMinoMovable(futureMino, this.field)){
+                this.mino.y += this.minoVy;
+            }
             this.minoVy = 0;
         }
         if(this.minoVr != 0){
-            this.mino.rot += this.minoVr;
+            let futureMino = new Mino(this.mino.x, this.mino.y, this.mino.rot, this.mino.shape);
+            futureMino.rot += this.minoVr;
+            if (this.isMinoMovable(futureMino, this.field)){
+                this.mino.rot += this.minoVr;
+            }
             this.minoVr = 0;
         }
         this.mino.draw();

@@ -139,14 +139,26 @@ class Field {
     }
     setTile(x, y) {
         this.tiles[y][x] = 1;
+        if(this.tiles[y].every(b => b==1)){
+            for(let x=0; x<field_width-1; x++){
+                this.tiles[y][x] = 0;
+            }
+            for(y=y-1; y>0; y--){
+                for(let x=0; x<field_width-1; x++){
+                    this.tiles[y+1][x] = this.tiles[y][x];
+                }
+            }
+        } 
     }
     draw() {
         ctx.fillStyle = "black";
         for(let row=0; row<field_height; row++){
+            // if(this.tiles[row].every(b => b==1)) console.log(row);
             for(let col=0; col<field_width; col++){
                 if(this.tileAt(col, row) == 1) ctx.fillRect(col*size, row*size, size, size);
             }
         }
+        
     }
 }
 
@@ -168,7 +180,6 @@ class Game {
     }
     isMinoMovable(mino, field) {
         let blocks = mino.calcBlocks();
-        // blocks.forEach(b => console.log(b.y+mino.y));
         return blocks.every(b => field.tileAt(b.x+mino.x,b.y+mino.y) == 0);
     }
     proc(){

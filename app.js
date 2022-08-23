@@ -1,4 +1,5 @@
 var canvas = document.getElementById("can");
+const message = document.getElementById("message");
 var ctx = canvas.getContext("2d");
 var size = 30;
 var field_width = 12;
@@ -9,6 +10,7 @@ var initialX = 5;
 var initialY = 2;
 var initialR = 0;
 var initialSpeed = 0;
+var stopGame = false;
 
 
 class Block {
@@ -51,10 +53,10 @@ class Mino {
             ]; break;
             //Z
             case 1: blocks = [
-                new Block(-1,-1),
-                new Block(0,-1),
                 new Block(0,0),
+                new Block(0,-1),
                 new Block(1,0),
+                new Block(1,1),
             ]; break;
             //S
             case 2: blocks = [
@@ -72,17 +74,17 @@ class Mino {
             ]; break; 
             //J
             case 4: blocks = [
-                new Block(0,0),
+                new Block(1,0),
+                new Block(1,1),
+                new Block(1,-1),
                 new Block(0,1),
-                new Block(0,-1),
-                new Block(-1,1),
             ]; break; 
             //O
             case 5: blocks = [
                 new Block(0,0),
-                new Block(0,1),
+                new Block(0,-1),
                 new Block(1,0),
-                new Block(1,1),
+                new Block(1,-1),
             ]; break; 
             //I
             case 6: blocks = [
@@ -137,9 +139,14 @@ class Field {
     tileAt(x, y) {
         return this.tiles[y][x];
     }
+    isRowFull(y){
+        return this.tiles[y].every(b => b==1);
+    }
     setTile(x, y) {
         this.tiles[y][x] = 1;
-        if(this.tiles[y].every(b => b==1)){
+    }
+    eraseTile(y){
+        if(this.isRowFull(y)){
             for(let x=0; x<field_width-1; x++){
                 this.tiles[y][x] = 0;
             }
@@ -153,7 +160,6 @@ class Field {
     draw() {
         ctx.fillStyle = "black";
         for(let row=0; row<field_height; row++){
-            // if(this.tiles[row].every(b => b==1)) console.log(row);
             for(let col=0; col<field_width; col++){
                 if(this.tileAt(col, row) == 1) ctx.fillRect(col*size, row*size, size, size);
             }
@@ -173,9 +179,11 @@ class Game {
     newMino(mino, field){
         random = Math.floor(Math.random()*maxMino);
         let blocks = mino.calcBlocks();
+        if(blocks.some(b => field.tileAt(b.x+initialX,b.y+initialY) == 1)) stopGame = true;
         if(blocks.some(b => field.tileAt(b.x+mino.x,b.y+mino.y) == 1)){
             blocks.forEach(b => field.setTile(b.x+mino.x, b.y+mino.y-1));
-            this.mino = new Mino(initialX, initialY, initialR, random);
+            blocks.forEach(b => field.eraseTile(b.y+mino.y-1));
+            if(!stopGame) this.mino = new Mino(initialX, initialY, initialR, random);
         }
     }
     isMinoMovable(mino, field) {
@@ -247,6 +255,9 @@ document.addEventListener("keypress", event => {
         game.minoVy = +1;
         game.proc();
     }
+    if(keyName == "p"){
+        stopGame = true;
+    }
 })
 
 let counter = 0;
@@ -257,10 +268,12 @@ const timerId = setInterval(function(){
         counter = 0;
     }
     game.proc();
-    if(keyName == "p"){ 
+    if(stopGame){ 
         clearInterval(timerId)
+        message.textContent = "Game Over"
     }
 }, 20)
+
 
 
 
